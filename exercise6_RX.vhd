@@ -33,31 +33,27 @@ begin
     begin
         if rst_n = '0' then
             current_state <= IDLE;
-			clk_buff <= 0;
+			
         elsif rising_edge(clk) then
             current_state <= next_state;
 			
+			
+        end if;
+    end process;
+	
+	 p_clk_divider: process(clk , rst_n)
+	begin
+		if rst_n = '0' then
+			clk_buff <= 0;
+		elsif rising_edge(clk) then
 			if clk_buff < clk_divider then 
 				clk_buff<= clk_buff + 1;
 			else
 				clk_buff<=0;
 				UART_OVERSAMLE_CLK<= NOT(UART_OVERSAMLE_CLK);
 			end if;
-        end if;
-    end process;
-	
-	 -- p_clk_divider: process(clk , rst_n)
-	-- variable clk_buff : integer range 0 to clk_divider;
-	-- begin
-		-- if rising_edge(clk) then
-			-- if clk_buff < clk_divider then 
-				-- clk_buff<= clk_buff + 1;
-			-- else
-				-- clk_buff<=0;
-				-- UART_OVERSAMLE_CLK<= NOT(UART_OVERSAMLE_CLK);
-			-- end if;
-		-- end if;	
-	 -- end process;
+		end if;	
+	 end process;
 	
 	
     process(current_state, rx_in, data_tmp, bit_counter, sample_counter,UART_OVERSAMLE_CLK)
