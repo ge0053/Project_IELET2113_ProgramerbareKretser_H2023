@@ -26,7 +26,7 @@ architecture RTL of exercise6_RX is
     signal sample_counter : integer range 0 to 7 := 0;
     signal data_tmp : std_logic_vector(7 downto 0) := (others => '0');
 	signal UART_OVERSAMLE_CLK : std_logic:='0';
-	signal alignStart : std_logic:='0';
+	signal alignStart : std_logic_vector (1 downto 0 ) :="00";
 	signal clk_buff : integer range 0 to clk_divider:=0;
 	
 begin
@@ -44,36 +44,46 @@ begin
     end process;
 	
 	 p_clk_divider: process(clk , rst_n,alignStart)
+	 variable v_UART_OVERSAMPLE_CLK: std_logic := UART_OVERSAMLE_CLK;
+	 variable v_clk_buff:  integer range 0 to clk_divider:= clk_buff;
 	begin
-		if rst_n = '0' or (rising_edge(alignStart) )  then
+		if   (alignStart) = "01"  then
 		-- align clock
-			clk_buff <= 0;
-			UART_OVERSAMLE_CLK<='0';
+			v_clk_buff := 0;
+			v_UART_OVERSAMPLE_CLK:='0';
 		elsif rising_edge(clk) then
-			if clk_buff < clk_divider then 
-				clk_buff<= clk_buff + 1;
+			if v_clk_buff < clk_divider then 
+				v_clk_buff:= clk_buff + 1;
 			else
-				clk_buff<=0;
-				UART_OVERSAMLE_CLK<= NOT(UART_OVERSAMLE_CLK);
+				v_clk_buff:=0;
+				v_UART_OVERSAMPLE_CLK:= NOT(v_UART_OVERSAMPLE_CLK);
 			end if;
+			
 		end if;	
+		UART_OVERSAMLE_CLK <=v_UART_OVERSAMPLE_CLK;
+		clk_buff<= v_clk_buff;
 	 end process;
 	
 	
-    process(current_state, rx_in, data_tmp, bit_counter, sample_counter,UART_OVERSAMLE_CLK)
+    process(all)
+	variable tmp_alignStart : std_logic:='0';
     begin
 		if current_state = IDLE then
 			-- detect possible startbit and align clock to this.
 			if rx_in = '0' then
 				next_state <= START;
 				sample_counter <= 0;
-				alignStart <='1';
+				tmp_alignStart :='1';
+			else 
+			tmp_alignStart :='0';
 			end if;
-			
+		else 
+			tmp_alignStart := '0';
 		end if;	
+		alignStart <= alignStart(0) & tmp_alignStart;
 		if rising_edge(UART_OVERSAMLE_CLK) then
 			done <= '0';
-			next_state <= current_state;  -- Default
+			--next_state <= current_state;  -- Default
 
 			case current_state is
 				when IDLE =>
@@ -81,7 +91,8 @@ begin
 					
 				when START =>
 					if sample_counter = (OVERSAMPLING/2-1) then --sampe at 3
-						alignStart <='0';
+						--alignStart <='0';
+						
 						if rx_in = '0' then
 							next_state <= DATA;
 							sample_counter <= 0;
@@ -121,6 +132,9 @@ begin
 						sample_counter <= sample_counter + 1;
 					end if;
 			end case;
+		else 
+			sample_counter <= sample_counter;
+			next_state <= next_state;
 		end if;
 			
     end process;

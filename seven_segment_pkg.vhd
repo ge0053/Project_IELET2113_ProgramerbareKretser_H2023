@@ -4,17 +4,19 @@ use ieee.numeric_std.all;
 
 package seven_segment_pkg is -- same as .h-file in c
 	subtype t_svn_segment is std_logic_vector(6 downto 0);
-
+	type t_svnHex_truthTable is array (0 to 15) of std_logic_vector ( 6 downto 0);
+	type t_svnAscii_truthTable is array (0 to 94) of std_logic_vector ( 6 downto 0);
+	subtype t_nibble is std_logic_vector(3 downto 0);
 	function vecTo_svnSegmentHex (num: std_logic_vector (3 downto 0 ) ) return t_svn_segment ;
 	function vecTo_svnSegmentAscii (num: std_logic_vector (7 downto 0 ) ) return t_svn_segment ;
 		
-		);
+	
 end package;
 
 package body seven_segment_pkg is -- is the function definition
 
 	function vecTo_svnSegmentHex(num: t_nibble) return t_svn_segment is 
-		constant a_segemnts : t_svn_segment := (			
+		constant a_segemnts : t_svnHex_truthTable := (			
 		"1000000",	--0
 		"1111001",	--1
 		"0100100",	--2
@@ -39,7 +41,7 @@ package body seven_segment_pkg is -- is the function definition
 	end function;
 	
 	function vecTo_svnSegmentAscii (num: std_logic_vector (7 downto 0 ) ) return t_svn_segment is 
-		constant a_segemnts : t_svn_segment := (
+		constant a_segemnts : t_svnAscii_truthTable := (
 			"00000000", /* (space) */
 			"10000000", /* ! null */
 			"00100010", /* "  */
@@ -135,17 +137,18 @@ package body seven_segment_pkg is -- is the function definition
 			"00110000", /* | */
 			"10000000", /* } null */
 			"10000000", /* ~ null */
-			"00000000", /* (del) */
+			"00000000" /* (del) */
 		);
 		
 		
 		
 		begin
 		if (to_integer(unsigned(num)) <= 127) and (to_integer(unsigned(num)) >= 32) then 
-			return a_segemnts(to_integer(unsigned(num)-32);
+			return a_segemnts(to_integer(unsigned(num)-32));
 		else
-			return a_segemnts("10000000");
+			return "10000000";
 		end if;
+		end function;
 
 	
 end package body;
