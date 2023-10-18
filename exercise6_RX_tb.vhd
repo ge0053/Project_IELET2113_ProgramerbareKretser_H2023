@@ -25,7 +25,7 @@ end component;
 
 	signal clk   :   std_logic := '0';
 	signal rst_n :   std_logic;
-	signal rx_in :   std_logic;
+	signal rx_in :   std_logic:='1';
 	signal data_out  :  std_logic_vector(7 downto 0);
 	signal done  :  std_logic;
 
@@ -41,11 +41,9 @@ begin
 
 
 
--- duv : entity work.exercise6_RX
---generic map ( 3, 50_000_000,60*7)
---port map ( clk ,rst_n,rx_in,data_out,done) ; 
 
-clk <= not clk after 10 ns;	-- inverterer hvert 10ns
+clk <= not clk after 10 ns;	-- invert. aprox 50MHz
+rx_in <= not rx_in after 52 us;	-- invert. aprox 9600 baudrate
 process is
 begin
 rst_n <= '0' ;
