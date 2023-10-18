@@ -62,6 +62,7 @@ begin
     process(current_state, rx_in, data_tmp, bit_counter, sample_counter,UART_OVERSAMLE_CLK)
     begin
 		if current_state = IDLE then
+			-- detect possible startbit and align clock to this.
 			if rx_in = '0' then
 				next_state <= START;
 				sample_counter <= 0;
