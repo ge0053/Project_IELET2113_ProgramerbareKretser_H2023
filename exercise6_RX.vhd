@@ -46,6 +46,7 @@ begin
 	 p_clk_divider: process(clk , rst_n,alignStart)
 	begin
 		if rst_n = '0' or (rising_edge(alignStart) )  then
+		-- align clock
 			clk_buff <= 0;
 			UART_OVERSAMLE_CLK<='0';
 		elsif rising_edge(clk) then
