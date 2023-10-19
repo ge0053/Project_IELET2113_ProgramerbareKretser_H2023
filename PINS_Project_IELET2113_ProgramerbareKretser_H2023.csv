@@ -1,0 +1,83 @@
+# Copyright (C) 2023  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+
+# Quartus Prime Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
+# File: C:\Users\hoved\Documents\programerbareKretserProjsjekter\prosjekt1\Project_IELET2113_ProgramerbareKretser_H2023\PINS_Project_IELET2113_ProgramerbareKretser_H2023.csv
+# Generated on: Thu Oct 19 18:44:21 2023
+
+# Note: The column header names should not be changed if you wish to import this .csv file into the Quartus Prime software.
+
+To,Direction,Location,I/O Bank,VREF Group,Fitter Location,I/O Standard,Reserved,Current Strength,Slew Rate,Differential Pair,Strict Preservation
+clk,Input,PIN_P11,3,B3_N0,PIN_P11,2.5 V,,,,,
+key[3],Input,PIN_C12,7,B7_N0,PIN_C12,2.5 V,,,,,
+key[2],Input,PIN_D12,7,B7_N0,PIN_D12,2.5 V,,,,,
+key[1],Input,PIN_C11,7,B7_N0,PIN_C11,2.5 V,,,,,
+key[0],Input,PIN_C10,7,B7_N0,PIN_C10,2.5 V,,,,,
+rst_n,Input,PIN_B8,7,B7_N0,PIN_B8,2.5 V,,,,,
+rx_in,Input,PIN_AB8,3,B3_N0,PIN_AB8,2.5 V,,,,,
+svnSegment[0],Output,,,,,,,,,,
+svnSegment[1],Output,,,,,,,,,,
+svnSegment[2],Output,,,,,,,,,,
+svnSegment[3],Output,,,,,,,,,,
+svnSegment[4],Output,,,,,,,,,,
+svnSegment[5],Output,,,,,,,,,,
+svnSegment[0][0],Output,PIN_C14,7,B7_N0,PIN_C14,2.5 V,,,,,
+svnSegment[0][1],Output,PIN_E15,7,B7_N0,PIN_E15,2.5 V,,,,,
+svnSegment[0][2],Output,PIN_C15,7,B7_N0,PIN_C15,2.5 V,,,,,
+svnSegment[0][3],Output,PIN_C16,7,B7_N0,PIN_C16,2.5 V,,,,,
+svnSegment[0][4],Output,PIN_E16,7,B7_N0,PIN_E16,2.5 V,,,,,
+svnSegment[0][5],Output,PIN_D17,7,B7_N0,PIN_D17,2.5 V,,,,,
+svnSegment[0][6],Output,PIN_C17,7,B7_N0,PIN_C17,2.5 V,,,,,
+svnSegment[0][7],Output,PIN_D15,7,B7_N0,PIN_D15,2.5 V,,,,,
+svnSegment[1][0],Output,PIN_C18,7,B7_N0,PIN_C18,2.5 V,,,,,
+svnSegment[1][1],Output,PIN_D18,6,B6_N0,PIN_D18,2.5 V,,,,,
+svnSegment[1][2],Output,PIN_E18,6,B6_N0,PIN_E18,2.5 V,,,,,
+svnSegment[1][3],Output,PIN_B16,7,B7_N0,PIN_B16,2.5 V,,,,,
+svnSegment[1][4],Output,PIN_A17,7,B7_N0,PIN_A17,2.5 V,,,,,
+svnSegment[1][5],Output,PIN_A18,7,B7_N0,PIN_A18,2.5 V,,,,,
+svnSegment[1][6],Output,PIN_B17,7,B7_N0,PIN_B17,2.5 V,,,,,
+svnSegment[1][7],Output,PIN_A16,7,B7_N0,PIN_A16,2.5 V,,,,,
+svnSegment[2][0],Output,PIN_B20,6,B6_N0,PIN_B20,2.5 V,,,,,
+svnSegment[2][1],Output,PIN_A20,7,B7_N0,PIN_A20,2.5 V,,,,,
+svnSegment[2][2],Output,PIN_B19,7,B7_N0,PIN_B19,2.5 V,,,,,
+svnSegment[2][3],Output,PIN_A21,6,B6_N0,PIN_A21,2.5 V,,,,,
+svnSegment[2][4],Output,PIN_B21,6,B6_N0,PIN_B21,2.5 V,,,,,
+svnSegment[2][5],Output,PIN_C22,6,B6_N0,PIN_C22,2.5 V,,,,,
+svnSegment[2][6],Output,PIN_B22,6,B6_N0,PIN_B22,2.5 V,,,,,
+svnSegment[2][7],Output,PIN_A19,7,B7_N0,PIN_A19,2.5 V,,,,,
+svnSegment[3][0],Output,PIN_F21,6,B6_N0,PIN_F21,2.5 V,,,,,
+svnSegment[3][1],Output,PIN_E22,6,B6_N0,PIN_E22,2.5 V,,,,,
+svnSegment[3][2],Output,PIN_E21,6,B6_N0,PIN_E21,2.5 V,,,,,
+svnSegment[3][3],Output,PIN_C19,7,B7_N0,PIN_C19,2.5 V,,,,,
+svnSegment[3][4],Output,PIN_C20,6,B6_N0,PIN_C20,2.5 V,,,,,
+svnSegment[3][5],Output,PIN_D19,6,B6_N0,PIN_D19,2.5 V,,,,,
+svnSegment[3][6],Output,PIN_E17,6,B6_N0,PIN_E17,2.5 V,,,,,
+svnSegment[3][7],Output,PIN_D22,6,B6_N0,PIN_D22,2.5 V,,,,,
+svnSegment[4][0],Output,PIN_F18,6,B6_N0,PIN_F18,2.5 V,,,,,
+svnSegment[4][1],Output,PIN_E20,6,B6_N0,PIN_E20,2.5 V,,,,,
+svnSegment[4][2],Output,PIN_E19,6,B6_N0,PIN_E19,2.5 V,,,,,
+svnSegment[4][3],Output,PIN_J18,6,B6_N0,PIN_J18,2.5 V,,,,,
+svnSegment[4][4],Output,PIN_H19,6,B6_N0,PIN_H19,2.5 V,,,,,
+svnSegment[4][5],Output,PIN_F19,6,B6_N0,PIN_F19,2.5 V,,,,,
+svnSegment[4][6],Output,PIN_F20,6,B6_N0,PIN_F20,2.5 V,,,,,
+svnSegment[4][7],Output,PIN_F17,6,B6_N0,PIN_F17,2.5 V,,,,,
+svnSegment[5][0],Output,PIN_J20,6,B6_N0,PIN_J20,2.5 V,,,,,
+svnSegment[5][1],Output,PIN_K20,6,B6_N0,PIN_K20,2.5 V,,,,,
+svnSegment[5][2],Output,PIN_L18,6,B6_N0,PIN_L18,2.5 V,,,,,
+svnSegment[5][3],Output,PIN_N18,6,B6_N0,PIN_N18,2.5 V,,,,,
+svnSegment[5][4],Output,PIN_M20,6,B6_N0,PIN_M20,2.5 V,,,,,
+svnSegment[5][5],Output,PIN_N19,6,B6_N0,PIN_N19,2.5 V,,,,,
+svnSegment[5][6],Output,PIN_N20,6,B6_N0,PIN_N20,2.5 V,,,,,
+svnSegment[5][7],Output,PIN_L19,6,B6_N0,PIN_L19,2.5 V,,,,,

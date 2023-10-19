@@ -17,8 +17,8 @@ entity exercise6_RX is
 end exercise6_RX;
 
 architecture RTL of exercise6_RX is
-	-- divide by 4 since every positive edge should generate a sample.
-	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(OVERSAMPLING)/real(BAUDRATE))*real(1000)/real(4));
+	-- divide by 2 since every positive edge should generate a sample.
+	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(OVERSAMPLING)/real(BAUDRATE))*real(1000)/real(2));
 
     type state_type is (IDLE, START, DATA, STOP);
     signal current_state, next_state : state_type;
@@ -68,6 +68,7 @@ begin
     process(all)
 	variable tmp_alignStart : std_logic:='0';
     begin
+		
 		if current_state = IDLE then
 			-- detect possible startbit and align clock to this.
 			if rx_in = '0' then
