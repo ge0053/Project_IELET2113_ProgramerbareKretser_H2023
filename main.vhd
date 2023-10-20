@@ -9,9 +9,12 @@ entity project1 is
 --type  t_disp is array (0 to 3) of t_svn_segment;
 
 generic (
-DUTY_BITS: natural :=3 ;
-F_CLK_MHz: natural :=50;
-CYCLE_TIME_ns: natural:=60);
+	F_CLK_KHz: natural :=50000 ;
+	OVERSAMPLING: natural:=8 ;
+	BAUDRATE : natural:=9600;
+	WORD_LENGTH: natural:=9;
+	PARITY_ON : natural := 1 ; --0 or 1
+	PARITY_ODD : std_logic:='0');
 
 port (
         clk   : in  std_logic;
@@ -19,7 +22,8 @@ port (
         rx_in : in  std_logic;
 		
 		svnSegment : out t_6_svn_disp;
-		key: in std_logic_vector(3 downto 0)
+		key: in std_logic_vector(3 downto 0);
+		rx_done  :  out std_logic:='0'
 		);
 
 
@@ -34,7 +38,10 @@ architecture rtl1 of project1 is
 	generic(
 	F_CLK_KHz: natural :=50000 ;
 	OVERSAMPLING: natural:=8 ;
-	BAUDRATE : natural:=9600 );
+	BAUDRATE : natural:=9600;
+	WORD_LENGTH: natural:=9;
+	PARITY_ON : natural :=1;
+	PARITY_ODD : std_logic:='0');
     port(
         clk   : in  std_logic;
         rst_n : in  std_logic;
@@ -46,7 +53,7 @@ architecture rtl1 of project1 is
 	
 	end component;
 	signal rx_data  :  std_logic_vector(7 downto 0):="00000000";
-    signal rx_done  :  std_logic:='0';
+    
 
 
 begin
@@ -63,8 +70,10 @@ begin
 
 svnSegment(0) <= vecTo_svnSegmentHex(rx_data(3 downto 0));
 svnSegment(1) <= vecTo_svnSegmentHex(rx_data(7 downto 4));
-svnSegment(3) <= vecTo_svnSegmentHex(key(2 downto 0) & rx_in);
 svnSegment(2) <= vecTo_svnSegmentAscii(rx_data);
+svnSegment(3) <= "11111111";
+svnSegment(4) <= "11111111";
+svnSegment(5) <= "11111111";
 
 
 
