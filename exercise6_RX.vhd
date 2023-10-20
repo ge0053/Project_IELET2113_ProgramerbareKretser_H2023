@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.std_logic_vec_pkg.all;
+use work.fifo_pkg.all;
 
 entity exercise6_RX is
 	generic(
@@ -9,8 +10,9 @@ entity exercise6_RX is
 	OVERSAMPLING: natural:=8 ;
 	BAUDRATE : natural:=9600;
 	WORD_LENGTH: natural:=9;
-	PARITY_ON : natural := 1 ; --0 or 1
-	PARITY_ODD : std_logic:='0');
+	PARITY_ON : natural := 0 ; --0 or 1
+	PARITY_ODD : std_logic:='0';
+	FIFO_LENGTH: natural:= 16);
     port(
         clk   : in  std_logic;
         rst_n : in  std_logic;
@@ -24,6 +26,8 @@ architecture RTL of exercise6_RX is
 	-- divide by 2 since every positive edge should generate a sample.
 	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(OVERSAMPLING)/real(BAUDRATE))*real(1000)/real(2));
 	constant dataLength: integer:=WORD_LENGTH-PARITY_ON;
+	constant c_sampleLowerBound: integer:=(OVERSAMPLING/4)-1; -- start sample at 1/4.
+	constant c_sampleUpperBound: integer:=OVERSAMPLING-(OVERSAMPLING/4)-1; --end sample at 3/4
     type state_type is (IDLE, START, DATA, STOP);
     signal current_state, next_state : state_type;
     signal bit_counter : integer range 0 to WORD_LENGTH-1 := 0;
@@ -32,8 +36,11 @@ architecture RTL of exercise6_RX is
 	signal UART_OVERSAMLE_CLK : std_logic:='0';
 	signal alignStart : std_logic_vector (1 downto 0 ) :="00";
 	signal clk_buff : integer range 0 to clk_divider:=0;
-	signal sampler : std_logic_vector ((OVERSAMPLING-4) downto 0);
+	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	
+	signal outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
+									place=>1,
+									pop=>0);
 begin
 
     process(all)
@@ -110,7 +117,7 @@ begin
 						else
 							next_state <= IDLE;
 						end if;
-					elsif (sample_counter >=0) and (sample_counter <=OVERSAMPLING-4) then
+					elsif (sample_counter >=c_sampleLowerBound) and (sample_counter <=c_sampleUpperBound) then
 						sampler(sample_counter)<=rx_in;
 						sample_counter <= sample_counter+1;
 					else 
@@ -129,7 +136,7 @@ begin
 								bit_counter <= bit_counter + 1;
 								sample_counter<=0;
 							end if;
-					elsif (sample_counter >=0) and (sample_counter <=OVERSAMPLING-4) then
+					elsif (sample_counter >=c_sampleLowerBound) and (sample_counter <=c_sampleUpperBound) then
 							sampler(sample_counter)<=rx_in;
 							sample_counter <= sample_counter+1;
 					else 
@@ -141,11 +148,10 @@ begin
 					if sample_counter = OVERSAMPLING-1 then
 						if vec_more_Ones(sampler) then 
 							-- only update if startbit is true and PARITY_ON is true
-							if (PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD) then
-								data_out <= data_tmp(dataLength-1 downto 0);
-							
-							else
-								data_out <= data_tmp(dataLength-1 downto 0);
+							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
+								--only add new if parity is turned off or ok.
+								fifo_place(outBuffer,data_tmp);
+								fifo_pop(outBuffer,data_out);
 							end if;
 
 						end if;
@@ -155,7 +161,7 @@ begin
 						sample_counter <= 0;
 						bit_counter <= 0;
 					
-					elsif (sample_counter >=0) and (sample_counter <=OVERSAMPLING-4) then
+					elsif (sample_counter >=c_sampleLowerBound) and (sample_counter <=c_sampleUpperBound) then
 						sampler(sample_counter)<=rx_in;
 						sample_counter <= sample_counter+1;
 					else 

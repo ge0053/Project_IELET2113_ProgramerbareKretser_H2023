@@ -1,12 +1,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.UART_datatypes_pkg.all;
 
 package std_logic_vec_pkg is -- same as .h-file in c
 	
 	function vec_more_Ones (num: std_logic_vector  ) return std_logic ;
 	function vec_parity (num: std_logic_vector  ) return std_logic ;
-	
 		
 	
 end package;
@@ -21,7 +21,7 @@ package body std_logic_vec_pkg is -- is the function definition
 					ones:=ones+1;
 				end if;
 			end loop;
-			if ones >= (num'length/2) then
+			if ones > (num'length/2) then
 				return '1';
 			else
 				return '0';

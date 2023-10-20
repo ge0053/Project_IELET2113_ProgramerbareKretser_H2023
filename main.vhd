@@ -36,12 +36,12 @@ end entity;
 architecture rtl1 of project1 is
 	component exercise6_RX is
 	generic(
-	F_CLK_KHz: natural :=50000 ;
-	OVERSAMPLING: natural:=8 ;
-	BAUDRATE : natural:=9600;
-	WORD_LENGTH: natural:=9;
-	PARITY_ON : natural :=1;
-	PARITY_ODD : std_logic:='0');
+	F_CLK_KHz: natural :=F_CLK_KHz ;
+	OVERSAMPLING: natural:=OVERSAMPLING ;
+	BAUDRATE : natural:=BAUDRATE;
+	WORD_LENGTH: natural:=WORD_LENGTH;
+	PARITY_ON : natural :=PARITY_ON;
+	PARITY_ODD : std_logic:=PARITY_ODD);
     port(
         clk   : in  std_logic;
         rst_n : in  std_logic;
