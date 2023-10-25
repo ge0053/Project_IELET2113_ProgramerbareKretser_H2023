@@ -14,9 +14,11 @@ package fifo_pkg is
 		full: std_logic;
 		
 	end record t_fifo;
-	--procedure init(object: inout t_fifo);
+	-- add element to the fifo
 	procedure fifo_place(variable object: inout t_fifo; signal data: in std_logic_vector);
+	-- remove element  from fifo
 	procedure fifo_pop(variable object: inout t_fifo; signal data: out std_logic_vector);
+	-- read fifo element relative to the oldest element. do not throw out.
 	function fifo_get(signal object: in t_fifo; offset: in integer)return std_logic_vector;
 
 
@@ -24,7 +26,6 @@ end package ;
 
 
 package body fifo_pkg is
-
     procedure fifo_place(variable object: inout t_fifo; signal data: in std_logic_vector) is 
 
 	begin
@@ -40,10 +41,6 @@ package body fifo_pkg is
 	
 	 procedure fifo_pop(variable object: inout t_fifo; signal data: out std_logic_vector) is 
 	begin
-		-- if ((object.place) mod (object.FIFO'length-1)) /= (object.pop mod (object.FIFO'length-1)) then 
-			-- data  <= object.FIFO(((object.pop)mod (object.FIFO'length-1)));
-			-- object.pop<=(object.pop+1 mod (object.FIFO'length-1));
-		-- end if;
 		
 		if ((object.place ) /= (object.pop )) or (object.full='1') then 
 			data <= object.FIFO(((object.pop) mod (object.FIFO'length)));

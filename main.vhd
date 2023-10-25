@@ -13,8 +13,8 @@ generic (
 	F_CLK_KHz: natural :=50000 ;
 	OVERSAMPLING: natural:=8 ;
 	BAUDRATE : natural:=9600;
-	WORD_LENGTH: natural:=8;
-	PARITY_ON : natural := 0 ; --0 or 1
+	WORD_LENGTH: natural:=9;
+	PARITY_ON : natural := 1 ; --0 or 1
 	PARITY_ODD : std_logic:='0');
 
 port (
