@@ -18,7 +18,8 @@ entity exercise6_RX is
         rst_n : in  std_logic;
         rx_in : in  std_logic;
         data_out  : out std_logic_vector(WORD_LENGTH-1-PARITY_ON downto 0);
-        done  : out std_logic
+        done  : out std_logic;
+		fifoBuffer: out t_fifo
     );
 end exercise6_RX;
 
@@ -39,8 +40,10 @@ architecture RTL of exercise6_RX is
 	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	
 	signal outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
-									place=>1,
-									pop=>0);
+									place=>0,
+									pop=>0,
+									full=>'0',
+									empty=>'1');
 begin
 
     process(all)
@@ -80,8 +83,9 @@ begin
 	
     process(all)
 	variable tmp_alignStart : std_logic:='0';
+	variable tmp_outBuffer : t_fifo ;
     begin
-		
+		tmp_outBuffer := outBuffer;
 		if current_state = IDLE then
 			
 			-- detect possible startbit and align clock to this.
@@ -102,11 +106,13 @@ begin
 			--next_state <= current_state;  -- Default
 
 			case current_state is
+--------------------------------------------------------------------
 				when IDLE =>
 					sampler<=(others =>'0');
 					if rst_n = '0' then 
 						data_out <= (others => '0');
 					end if;
+--------------------------------------------------------------------
 				when START =>
 					if sample_counter = OVERSAMPLING-1 then
 						if not(vec_more_Ones(sampler)) then
@@ -124,7 +130,7 @@ begin
 						sample_counter <= sample_counter+1;
 					end if;
 
-
+--------------------------------------------------------------------
 				when DATA =>
 					if sample_counter = OVERSAMPLING-1 then
 							data_tmp(bit_counter)<=vec_more_Ones(sampler);
@@ -143,15 +149,14 @@ begin
 							sample_counter <= sample_counter+1;
 					end if;
 
-
+--------------------------------------------------------------------
 				when STOP =>
 					if sample_counter = OVERSAMPLING-1 then
 						if vec_more_Ones(sampler) then 
-							-- only update if startbit is true and PARITY_ON is true
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
 								--only add new if parity is turned off or ok.
-								fifo_place(outBuffer,data_tmp);
-								fifo_pop(outBuffer,data_out);
+								fifo_place(tmp_outBuffer,data_tmp);
+								fifo_pop(tmp_outBuffer,data_out);
 							end if;
 
 						end if;
@@ -168,9 +173,12 @@ begin
 						sample_counter <= sample_counter+1;
 					end if;
 			end case;
+			outBuffer<=tmp_outBuffer;
+			fifoBuffer <= tmp_outBuffer;
 		else 
 			sample_counter <= sample_counter;
 			next_state <= next_state;
+
 		end if;
 			
     end process;

@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.fifo_pkg.all;
 
 use work.seven_segment_pkg.all;
 -- deklarasjon
@@ -12,8 +13,8 @@ generic (
 	F_CLK_KHz: natural :=50000 ;
 	OVERSAMPLING: natural:=8 ;
 	BAUDRATE : natural:=9600;
-	WORD_LENGTH: natural:=9;
-	PARITY_ON : natural := 1 ; --0 or 1
+	WORD_LENGTH: natural:=8;
+	PARITY_ON : natural := 0 ; --0 or 1
 	PARITY_ODD : std_logic:='0');
 
 port (
@@ -47,13 +48,14 @@ architecture rtl1 of project1 is
         rst_n : in  std_logic;
         rx_in : in  std_logic;
         data_out  : out std_logic_vector(7 downto 0);
-        done  : out std_logic
+        done  : out std_logic;
+		fifoBuffer: out t_fifo
     );
 	
 	
 	end component;
 	signal rx_data  :  std_logic_vector(7 downto 0):="00000000";
-    
+    signal fifoBuffer : t_fifo;
 
 
 begin
@@ -64,16 +66,17 @@ begin
         rst_n => rst_n,
         rx_in  => rx_in,
         data_out => rx_data,
-        done => rx_done
+        done => rx_done,
+		fifoBuffer => fifoBuffer
       );
 
 
 svnSegment(0) <= vecTo_svnSegmentHex(rx_data(3 downto 0));
 svnSegment(1) <= vecTo_svnSegmentHex(rx_data(7 downto 4));
 svnSegment(2) <= vecTo_svnSegmentAscii(rx_data);
-svnSegment(3) <= "11111111";
-svnSegment(4) <= "11111111";
-svnSegment(5) <= "11111111";
+svnSegment(3) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,1));
+svnSegment(4) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,2));
+svnSegment(5) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,3));
 
 
 

@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.fifo_pkg.all;
 entity exercise6_tb is
 end entity;
 
@@ -21,7 +22,8 @@ component exercise6_RX is
         rst_n : in  std_logic;
         rx_in : in  std_logic;
         data_out  : out std_logic_vector(WORD_LENGTH-1-PARITY_ON downto 0);
-        done  : out std_logic
+        done  : out std_logic;
+		fifoBuffer: out t_fifo
     );
 end component;
 
@@ -31,6 +33,7 @@ end component;
 	signal rx_in :   std_logic:='1';
 	signal data_out  :  std_logic_vector(9-2 downto 0);
 	signal done  :  std_logic;
+	signal fifoBuffer:  t_fifo;
 
 begin
  i_exercise6: component exercise6_RX
@@ -39,7 +42,8 @@ begin
         rst_n => rst_n,
         rx_in  => rx_in,
         data_out  => data_out,
-        done  => done
+        done  => done,
+		fifoBuffer => fifoBuffer
       );
 
 
