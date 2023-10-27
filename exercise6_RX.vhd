@@ -121,7 +121,7 @@ begin
 			case current_state is
 --------------------------------------------------------------------
 				when IDLE =>
-					data_ready<='0';
+					data_ready<='1';
 					done <= '0';
 					sampler<=(others =>'0');
 					if rst_n = '0' then 
@@ -130,7 +130,7 @@ begin
 --------------------------------------------------------------------
 				when START => -- sampel multiple points to make sure it was a startbit.
 					--when the signallength of 1 bit is finished
-					data_ready<='1';
+					data_ready<='0';
 					if sample_counter = OVERSAMPLING-1 then
 						-- if most samples are 0. goto state DATA. else state IDLE.
 						if not(vec_more_Ones(sampler)) then
@@ -151,7 +151,7 @@ begin
 
 --------------------------------------------------------------------
 				when DATA =>
-					data_ready<='1';
+					data_ready<='0';
 					-- take samples at every bit and append it to the data_tmp list.
 					-- do this until there are enough bits.
 					if sample_counter = OVERSAMPLING-1 then
@@ -173,7 +173,7 @@ begin
 
 --------------------------------------------------------------------
 				when STOP =>
-					data_ready<='1';
+					data_ready<='0';
 					if sample_counter = OVERSAMPLING-1 then
 						--check if it is a stopbit.
 						if vec_more_Ones(sampler) then 
@@ -198,7 +198,7 @@ begin
 						sample_counter <= sample_counter+1;
 					end if;
 				when others =>
-					data_ready<='0';
+					data_ready<='1';
 			end case;
 			outBuffer<=tmp_outBuffer;
 			fifoBuffer <= tmp_outBuffer;

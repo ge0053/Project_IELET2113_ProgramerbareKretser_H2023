@@ -26,14 +26,14 @@ end exercise6_TX;
 
 architecture RTL of exercise6_TX is
 	-- divide by 2 since every positive edge should generate a sample.
-	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(BAUDRATE))*real(1000)/real(2));
+	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(BAUDRATE))*real(1000));
 	-- the data length excluding parity.
 	
 	-- sample boundary. defines which steps to sample for data/stopbit/startbit 
 	--constant c_sampleLowerBound: integer:=(OVERSAMPLING/4)-1; -- start sample at 1/4.
 	--constant c_sampleUpperBound: integer:=OVERSAMPLING-(OVERSAMPLING/4)-1; --end sample at 3/4
 	-- possible states
-type state_type is (IDLE, DATA, PARITY, STOP);
+type state_type is (IDLE,START, DATA, PARITY, STOP);
  signal current_state, next_state : state_type;
 	-- hold controll over which databit we are reading.
 	signal bit_counter : integer range 0 to DATA_LENGTH-1 := 0;
@@ -46,7 +46,7 @@ type state_type is (IDLE, DATA, PARITY, STOP);
 	-- edge detection of startbit
 	signal alignStart : std_logic_vector (1 downto 0 ) :="00";
 	signal clk_buff : integer range 0 to clk_divider+1:=0;
-	signal next_clk_buff : integer range 0 to clk_divider+1:=0;
+	--signal next_clk_buff : integer range 0 to clk_divider+1:=0;
 	-- hold the samled values
 --	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	-- sample of data
@@ -72,22 +72,22 @@ begin
 	
 	
     process(all)
-	variable next_clk_buff
+	variable next_clk_buff : integer range 0 to clk_divider+1:=0;
     begin
 		--tmp_outBuffer := outBuffer;
 	
 		if rising_edge(clk) then
-			next_clk_buff<=clk_buff;
+			next_clk_buff:=clk_buff;
 			next_ready<=ready;
 			case current_state is
 --------------------------------------------------------------------
 				when IDLE =>
-					tx_out<='0';
-					next_clk_buff<=0;
+					tx_out<='1';
+					next_clk_buff:=0;
 					bit_counter<=0;
 					if send_data ='1' then
 						data_sample <= data_in;
-						next_state <= DATA;
+						next_state <= START;
 						next_ready<='0';
 						-- calculate parity
 						if PARITY_ON=1 then 
@@ -95,6 +95,17 @@ begin
 						end if;
 					else
 					next_ready<='1';
+					end if;
+----------------------------------------------------------------------
+				when START =>
+					tx_out<='0';
+					if clk_buff >=clk_divider then
+					
+						next_state <=DATA;
+
+						next_clk_buff:=0;
+					else
+						next_clk_buff:=next_clk_buff+1;
 					end if;
 --------------------------------------------------------------------
 				when DATA => -- sampel multiple points to make sure it was a startbit.
@@ -112,10 +123,10 @@ begin
 						end if;
 						--shift right
 						data_sample<='0' & data_sample(DATA_LENGTH-1 downto 1);
-						next_clk_buff<=0;
+						next_clk_buff:=0;
 						
 					else
-						next_clk_buff<=next_clk_buff+1;
+						next_clk_buff:=next_clk_buff+1;
 						
 					end if;
 --------------------------------------------------------------------
@@ -125,21 +136,21 @@ begin
 					
 						next_state <=STOP;
 
-						next_clk_buff<=0;
+						next_clk_buff:=0;
 					else
-					next_clk_buff<=next_clk_buff+1;
+					next_clk_buff:=next_clk_buff+1;
 					end if;
 					
 --------------------------------------------------------------------
 				when STOP =>
-					tx_out<='0';
+					tx_out<='1';
 					if clk_buff >=clk_divider then
 					
 						next_state <=IDLE;
 
-						next_clk_buff<=0;
+						next_clk_buff:=0;
 					else
-						next_clk_buff<=next_clk_buff+1;
+						next_clk_buff:=next_clk_buff+1;
 					end if;
 					
 			end case;
