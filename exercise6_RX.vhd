@@ -9,7 +9,7 @@ entity exercise6_RX is
 	F_CLK_KHz: natural :=50000 ;
 	OVERSAMPLING: natural:=8 ;
 	BAUDRATE : natural:=9600;
-	WORD_LENGTH: natural:=9;
+	DATA_LENGTH: natural:=8;
 	PARITY_ON : natural := 0 ; --0 or 1
 	PARITY_ODD : std_logic:='0';
 	FIFO_LENGTH: natural:= 16);
@@ -17,9 +17,10 @@ entity exercise6_RX is
         clk   : in  std_logic;
         rst_n : in  std_logic;
         rx_in : in  std_logic;
-        data_out  : out std_logic_vector(WORD_LENGTH-1-PARITY_ON downto 0);
+        data_out  : out std_logic_vector(DATA_LENGTH-1 downto 0);
         done  : out std_logic;
-		fifoBuffer: out t_fifo
+		fifoBuffer: out t_fifo;
+		data_ready: out std_logic
     );
 end exercise6_RX;
 
@@ -27,7 +28,7 @@ architecture RTL of exercise6_RX is
 	-- divide by 2 since every positive edge should generate a sample.
 	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(OVERSAMPLING)/real(BAUDRATE))*real(1000)/real(2));
 	-- the data length excluding parity.
-	constant dataLength: integer:=WORD_LENGTH-PARITY_ON;
+	constant dataLength: integer:=DATA_LENGTH;
 	-- sample boundary. defines which steps to sample for data/stopbit/startbit 
 	constant c_sampleLowerBound: integer:=(OVERSAMPLING/4)-1; -- start sample at 1/4.
 	constant c_sampleUpperBound: integer:=OVERSAMPLING-(OVERSAMPLING/4)-1; --end sample at 3/4
@@ -35,10 +36,10 @@ architecture RTL of exercise6_RX is
     type state_type is (IDLE, START, DATA, STOP);
     signal current_state, next_state : state_type;
 	-- hold controll over which databit we are reading.
-    signal bit_counter : integer range 0 to WORD_LENGTH-1 := 0;
+    signal bit_counter : integer range 0 to DATA_LENGTH-1+PARITY_ON := 0;
 	-- cold controll over which sample we are at
     signal sample_counter : integer range 0 to OVERSAMPLING-1 := 0;
-    signal data_tmp : std_logic_vector( WORD_LENGTH-1  downto 0) := (others => '0');
+    signal data_tmp : std_logic_vector( DATA_LENGTH-1+PARITY_ON  downto 0) := (others => '0');
 	-- the clock most of te system uses
 	signal UART_OVERSAMLE_CLK : std_logic:='0';
 	-- edge detection of startbit
@@ -47,6 +48,7 @@ architecture RTL of exercise6_RX is
 	-- hold the samled values
 	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	-- the fifo
+	 
 	signal outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
 									place=>0,
 									pop=>0,
@@ -119,6 +121,7 @@ begin
 			case current_state is
 --------------------------------------------------------------------
 				when IDLE =>
+					data_ready<='0';
 					done <= '0';
 					sampler<=(others =>'0');
 					if rst_n = '0' then 
@@ -127,6 +130,7 @@ begin
 --------------------------------------------------------------------
 				when START => -- sampel multiple points to make sure it was a startbit.
 					--when the signallength of 1 bit is finished
+					data_ready<='1';
 					if sample_counter = OVERSAMPLING-1 then
 						-- if most samples are 0. goto state DATA. else state IDLE.
 						if not(vec_more_Ones(sampler)) then
@@ -147,11 +151,12 @@ begin
 
 --------------------------------------------------------------------
 				when DATA =>
+					data_ready<='1';
 					-- take samples at every bit and append it to the data_tmp list.
 					-- do this until there are enough bits.
 					if sample_counter = OVERSAMPLING-1 then
 							data_tmp(bit_counter)<=vec_more_Ones(sampler);
-							if bit_counter = WORD_LENGTH-1 then
+							if bit_counter = DATA_LENGTH-1+PARITY_ON then
 								next_state <= STOP;
 								bit_counter <= 0;
 								sample_counter<=0;
@@ -168,7 +173,7 @@ begin
 
 --------------------------------------------------------------------
 				when STOP =>
-				
+					data_ready<='1';
 					if sample_counter = OVERSAMPLING-1 then
 						--check if it is a stopbit.
 						if vec_more_Ones(sampler) then 
@@ -192,6 +197,8 @@ begin
 					else 
 						sample_counter <= sample_counter+1;
 					end if;
+				when others =>
+					data_ready<='0';
 			end case;
 			outBuffer<=tmp_outBuffer;
 			fifoBuffer <= tmp_outBuffer;

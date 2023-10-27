@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.fifo_pkg.all;
+use work.seven_segment_pkg.all;
 entity exercise6_tb is
 end entity;
 
@@ -9,41 +10,47 @@ end entity;
 
 architecture testbench of exercise6_tb is
 
-component exercise6_RX is
-	generic(
+component project1 is
+generic (
 	F_CLK_KHz: natural :=50000 ;
 	OVERSAMPLING: natural:=8 ;
 	BAUDRATE : natural:=9600;
-	WORD_LENGTH: natural:=8;
+	DATA_LENGTH: natural:=8;
 	PARITY_ON : natural := 0 ; --0 or 1
 	PARITY_ODD : std_logic:='0');
-    port(
+
+port (
         clk   : in  std_logic;
         rst_n : in  std_logic;
         rx_in : in  std_logic;
-        data_out  : out std_logic_vector(WORD_LENGTH-1-PARITY_ON downto 0);
-        done  : out std_logic;
-		fifoBuffer: out t_fifo
-    );
+		
+		svnSegment : out t_6_svn_disp;
+		
+		rx_done  :  out std_logic:='0';
+		tx_data : out std_logic:='0'
+		
+		);
 end component;
 
 
-	signal clk   :   std_logic := '0';
-	signal rst_n :   std_logic;
-	signal rx_in :   std_logic:='1';
-	signal data_out  :  std_logic_vector(9-2 downto 0);
-	signal done  :  std_logic;
-	signal fifoBuffer:  t_fifo;
+        signal clk   :   std_logic:='0';
+        signal rst_n :   std_logic:='0';
+        signal rx_in :   std_logic:='0';
+
+		signal svnSegment :  t_6_svn_disp;
+
+		signal rx_done  :   std_logic:='0';
+		signal tx_data :  std_logic:='0';
 
 begin
- i_exercise6: component exercise6_RX
+ i_exercise6: component project1
     port map (
        clk => clk,  
         rst_n => rst_n,
         rx_in  => rx_in,
-        data_out  => data_out,
-        done  => done,
-		fifoBuffer => fifoBuffer
+        svnSegment  => svnSegment,
+        rx_done  => rx_done,
+		tx_data => tx_data
       );
 
 
