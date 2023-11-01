@@ -11,15 +11,16 @@ entity exercise6_RX is
 	BAUDRATE : natural:=9600;
 	DATA_LENGTH: natural:=8;
 	PARITY_ON : natural := 0 ; --0 or 1
-	PARITY_ODD : std_logic:='0';
-	FIFO_LENGTH: natural:= 16);
+	PARITY_ODD : std_logic:='0'
+	--FIFO_LENGTH: natural:= 16
+	);
     port(
         clk   : in  std_logic;
         rst_n : in  std_logic;
         rx_in : in  std_logic;
         data_out  : out std_logic_vector(DATA_LENGTH-1 downto 0);
         done  : out std_logic;
-		fifoBuffer: out t_fifo;
+		--fifoBuffer: out t_fifo;
 		data_ready: out std_logic
     );
 end exercise6_RX;
@@ -49,11 +50,11 @@ architecture RTL of exercise6_RX is
 	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	-- the fifo
 	 
-	signal outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
-									place=>0,
-									pop=>0,
-									full=>'0',
-									empty=>'1');
+	-- signal outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
+									-- place=>0,
+									-- pop=>0,
+									-- full=>'0',
+									-- empty=>'1');
 begin
 
     process(all)
@@ -97,9 +98,9 @@ begin
 	
     process(all)
 	variable tmp_alignStart : std_logic:='0';
-	variable tmp_outBuffer : t_fifo ;
+	--variable tmp_outBuffer : t_fifo ;
     begin
-		tmp_outBuffer := outBuffer;
+		--tmp_outBuffer := outBuffer;
 		if current_state = IDLE then
 			
 			-- detect possible startbit and align clock to this.
@@ -130,7 +131,7 @@ begin
 --------------------------------------------------------------------
 				when START => -- sampel multiple points to make sure it was a startbit.
 					--when the signallength of 1 bit is finished
-					data_ready<='1';
+					data_ready<='0';
 					if sample_counter = OVERSAMPLING-1 then
 						-- if most samples are 0. goto state DATA. else state IDLE.
 						if not(vec_more_Ones(sampler)) then
@@ -151,7 +152,7 @@ begin
 
 --------------------------------------------------------------------
 				when DATA =>
-					data_ready<='1';
+					data_ready<='0';
 					-- take samples at every bit and append it to the data_tmp list.
 					-- do this until there are enough bits.
 					if sample_counter = OVERSAMPLING-1 then
@@ -173,15 +174,18 @@ begin
 
 --------------------------------------------------------------------
 				when STOP =>
-					data_ready<='1';
+					
 					if sample_counter = OVERSAMPLING-1 then
 						--check if it is a stopbit.
 						if vec_more_Ones(sampler) then 
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
 								--only add new if parity is turned off or ok.
 								-- the current implementation is more like a ringbuffer than a fifo.
-								fifo_place(tmp_outBuffer,data_tmp);
-								fifo_pop(tmp_outBuffer,data_out);
+								--fifo_place(tmp_outBuffer,data_tmp);
+								--fifo_pop(tmp_outBuffer,data_out);
+								data_out<=data_tmp;
+								done <= '1';
+								data_ready<='1';
 							end if;
 
 						end if;
@@ -200,8 +204,8 @@ begin
 				when others =>
 					data_ready<='0';
 			end case;
-			outBuffer<=tmp_outBuffer;
-			fifoBuffer <= tmp_outBuffer;
+			--outBuffer<=tmp_outBuffer;
+			--fifoBuffer <= tmp_outBuffer;
 		else 
 			sample_counter <= sample_counter;
 			next_state <= next_state;

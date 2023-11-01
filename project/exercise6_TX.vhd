@@ -144,10 +144,11 @@ begin
 --------------------------------------------------------------------
 				when STOP =>
 					tx_out<='1';
+					next_ready<='1';
 					if clk_buff >=clk_divider then
 					
 						next_state <=IDLE;
-
+						
 						next_clk_buff:=0;
 					else
 						next_clk_buff:=next_clk_buff+1;

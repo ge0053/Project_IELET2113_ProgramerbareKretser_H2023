@@ -15,7 +15,7 @@ architecture Behavior of exercise6_tb is
 
     -- Signals
     signal clk              : std_logic := '0';
-    signal data_out         : std_logic_vector(7 downto 0) := "00000000";  -- Initialize to all zeros
+    signal data_out         : std_logic;  -- Initialize to all zeros
     signal RX_in            : std_logic := '1';
     signal rst_n            : std_logic := '1';
     signal done             : std_logic;
@@ -30,23 +30,24 @@ architecture Behavior of exercise6_tb is
 begin
 
     -- UART Receiver Instance
-    UART_Receiver_INST : entity work.exercise6_RX
+    UART_Receiver_INST : entity work.project1
         generic map (
             F_CLK_KHz => 50000,
             OVERSAMPLING => 8,
             BAUDRATE => 9600,
             DATA_LENGTH => 8,
             PARITY_ON => 0,
-            PARITY_ODD => '0',
-            FIFO_LENGTH => 16
+            PARITY_ODD => '0'
+            --FIFO_LENGTH => 16 
         )
         port map (
             clk => clk,
             rst_n => rst_n,
             rx_in => RX_in,
-            data_out => data_out,
-            done => done,
-            fifoBuffer => fifoBuffer_signal  -- Mapping FIFO Buffer
+            svnSegment => svnSegment,
+			rx_done => done,
+			tx_data => data_out
+            --fifoBuffer => fifoBuffer_signal  -- Mapping FIFO Buffer
         );
 
     -- Clock Generator
@@ -77,23 +78,21 @@ begin
             
             RX_in <= '1';
             
-            wait for 10*BIT_PERIOD;
+            wait for 20*BIT_PERIOD;
             
-            if fifoBuffer_signal.empty = '0' then
-                report "FIFO has data.";
-            else
-                report "FIFO is empty.";
-            end if;
+            -- if fifoBuffer_signal.empty = '0' then
+                -- report "FIFO has data.";
+            -- else
+                -- report "FIFO is empty.";
+            -- end if;
             
-            svnSegment(0) <= vecTo_svnSegmentHex(data_out(3 downto 0));
-            svnSegment(1) <= vecTo_svnSegmentHex(data_out(7 downto 4));
-            svnSegment(2) <= vecTo_svnSegmentAscii(data_out);
-            svnSegment(3) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer_signal, 1));
-            svnSegment(4) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer_signal, 2));
-            svnSegment(5) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer_signal, 3));
+            -- svnSegment(0) <= vecTo_svnSegmentHex(data_out(3 downto 0));
+            -- svnSegment(1) <= vecTo_svnSegmentHex(data_out(7 downto 4));
+            -- svnSegment(2) <= vecTo_svnSegmentAscii(data_out);
+            
             
             -- Increment data_out for the next iteration
-            data_out <= std_logic_vector(unsigned(data_out) + 1);
+            -- data_out <= std_logic_vector(unsigned(data_out) + 1);
         end loop;
         
         assert false report "Tests Complete" severity failure;
