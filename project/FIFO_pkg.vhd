@@ -21,7 +21,7 @@ package fifo_pkg is
 	procedure fifo_pop(variable object: inout t_fifo; signal data: out std_logic_vector);
 	-- read fifo element relative to the oldest element. do not throw out.
 	function fifo_get(signal object: in t_fifo; offset: in integer)return std_logic_vector;
-
+	--procedure fifo_reset(variable object: inout t_fifo);
 
 end package ;
 

@@ -29,7 +29,7 @@ architecture RTL of exercise6_RX is
 	-- divide by 2 since every positive edge should generate a sample.
 	constant clk_divider: integer:= integer ((real(F_CLK_KHz)/real(OVERSAMPLING)/real(BAUDRATE))*real(1000)/real(2));
 	-- the data length excluding parity.
-	constant dataLength: integer:=DATA_LENGTH;
+	--constant dataLength: integer:=DATA_LENGTH;
 	-- sample boundary. defines which steps to sample for data/stopbit/startbit 
 	constant c_sampleLowerBound: integer:=(OVERSAMPLING/4)-1; -- start sample at 1/4.
 	constant c_sampleUpperBound: integer:=OVERSAMPLING-(OVERSAMPLING/4)-1; --end sample at 3/4
@@ -72,7 +72,7 @@ begin
     end process;
 	
 		-- creates the clock divider
-	 p_clk_divider: process(clk , rst_n,alignStart)
+	 p_clk_divider: process(all)
 		
 		variable v_UART_OVERSAMPLE_CLK: std_logic := UART_OVERSAMLE_CLK;
 		variable v_clk_buff:  integer range 0 to clk_divider:= clk_buff;
@@ -122,7 +122,7 @@ begin
 			case current_state is
 --------------------------------------------------------------------
 				when IDLE =>
-					data_ready<='0';
+					data_ready<='1';
 					done <= '0';
 					sampler<=(others =>'0');
 					if rst_n = '0' then 
@@ -132,7 +132,7 @@ begin
 				when START => -- sampel multiple points to make sure it was a startbit.
 					--when the signallength of 1 bit is finished
 					data_ready<='0';
-					if sample_counter = OVERSAMPLING-1 then
+					if sample_counter = (OVERSAMPLING-1) then
 						-- if most samples are 0. goto state DATA. else state IDLE.
 						if not(vec_more_Ones(sampler)) then
 							sampler<=(others =>'0');	
@@ -155,9 +155,9 @@ begin
 					data_ready<='0';
 					-- take samples at every bit and append it to the data_tmp list.
 					-- do this until there are enough bits.
-					if sample_counter = OVERSAMPLING-1 then
+					if sample_counter = (OVERSAMPLING-1) then
 							data_tmp(bit_counter)<=vec_more_Ones(sampler);
-							if bit_counter = DATA_LENGTH-1+PARITY_ON then
+							if bit_counter = (DATA_LENGTH-1+PARITY_ON )then
 								next_state <= STOP;
 								bit_counter <= 0;
 								sample_counter<=0;
@@ -175,7 +175,7 @@ begin
 --------------------------------------------------------------------
 				when STOP =>
 					
-					if sample_counter = OVERSAMPLING-1 then
+					if sample_counter = (OVERSAMPLING-1) then
 						--check if it is a stopbit.
 						if vec_more_Ones(sampler) then 
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
@@ -185,7 +185,7 @@ begin
 								--fifo_pop(tmp_outBuffer,data_out);
 								data_out<=data_tmp;
 								done <= '1';
-								data_ready<='1';
+								data_ready<='0';
 							end if;
 
 						end if;
@@ -195,7 +195,7 @@ begin
 						sample_counter <= 0;
 						bit_counter <= 0;
 					--take new sample
-					elsif (sample_counter >=c_sampleLowerBound) and (sample_counter <=c_sampleUpperBound) then
+					elsif ((sample_counter >=c_sampleLowerBound) and (sample_counter <=c_sampleUpperBound)) then
 						sampler(sample_counter)<=rx_in;
 						sample_counter <= sample_counter+1;
 					else 

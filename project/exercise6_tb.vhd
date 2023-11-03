@@ -60,6 +60,7 @@ begin
     -- Testbench Logic
     test_proc : process
     begin
+	wait for 1 ms;
         for i in 0 to 255 loop
             data_to_send <= std_logic_vector(to_unsigned(i, 8));
  /*           

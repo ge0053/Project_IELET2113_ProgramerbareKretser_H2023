@@ -50,7 +50,7 @@ type state_type is (IDLE,START, DATA, PARITY, STOP);
 	-- hold the samled values
 --	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	-- sample of data
-	signal data_sample: std_logic_vector(DATA_LENGTH-1 downto 0);
+	signal data_sample: std_logic_vector(DATA_LENGTH-1 downto 0):= (others => '0');
 	signal next_ready: std_logic;
 begin
     process(all)
@@ -94,7 +94,7 @@ begin
 							parity_bit<=vec_parity(data_in) xor PARITY_ODD;
 						end if;
 					else
-					next_ready<='1';
+						next_ready<='1';
 					end if;
 ----------------------------------------------------------------------
 				when START =>
