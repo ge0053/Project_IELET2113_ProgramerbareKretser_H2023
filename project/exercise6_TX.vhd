@@ -51,7 +51,7 @@ type state_type is (IDLE,START, DATA, PARITY, STOP);
 --	signal sampler : std_logic_vector (c_sampleLowerBound to c_sampleUpperBound);
 	-- sample of data
 	signal data_sample: std_logic_vector(DATA_LENGTH-1 downto 0):= (others => '0');
-	signal next_ready: std_logic;
+	signal next_ready: std_logic:='0';
 begin
     process(all)
 	--update state
@@ -72,13 +72,13 @@ begin
 	
 	
     process(all)
-	variable next_clk_buff : integer range 0 to clk_divider+1:=0;
+	variable next_clk_buff : integer range 0 to clk_divider+1:=clk_buff;
     begin
 		--tmp_outBuffer := outBuffer;
 	
 		if rising_edge(clk) then
-			next_clk_buff:=clk_buff;
-			next_ready<=ready;
+			--next_clk_buff:=clk_buff;
+			--next_ready<=ready;
 			case current_state is
 --------------------------------------------------------------------
 				when IDLE =>

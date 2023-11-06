@@ -12,7 +12,7 @@ entity exercise6_RX is
 	DATA_LENGTH: natural:=8;
 	PARITY_ON : natural := 0 ; --0 or 1
 	PARITY_ODD : std_logic:='0'
-	--FIFO_LENGTH: natural:= 16
+
 	);
     port(
         clk   : in  std_logic;
@@ -180,9 +180,6 @@ begin
 						if vec_more_Ones(sampler) then 
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
 								--only add new if parity is turned off or ok.
-								-- the current implementation is more like a ringbuffer than a fifo.
-								--fifo_place(tmp_outBuffer,data_tmp);
-								--fifo_pop(tmp_outBuffer,data_out);
 								data_out<=data_tmp;
 								done <= '1';
 								data_ready<='0';
@@ -204,8 +201,7 @@ begin
 				when others =>
 					data_ready<='0';
 			end case;
-			--outBuffer<=tmp_outBuffer;
-			--fifoBuffer <= tmp_outBuffer;
+
 		else 
 			sample_counter <= sample_counter;
 			next_state <= next_state;

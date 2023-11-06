@@ -116,7 +116,7 @@ svnSegment(2) <= vecTo_svnSegmentAscii(rx_data);
 svnSegment(3) <= vecTo_svnSegmentHex(fifo_out(3 downto 0));
 svnSegment(4) <= vecTo_svnSegmentHex(fifo_out(7 downto 4));
 --svnSegment(4) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,2));
---svnSegment(5) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,3));
+svnSegment(5) <=rx_ready& tx_ready & fifo_out_ready & "11111";
 tx_data <=  tmp_signalOut;
 signalOut <=  tmp_signalOut;
 
