@@ -153,6 +153,7 @@ begin
 --------------------------------------------------------------------
 				when DATA =>
 					data_ready<='0';
+					done <= '1';
 					-- take samples at every bit and append it to the data_tmp list.
 					-- do this until there are enough bits.
 					if sample_counter = (OVERSAMPLING-1) then
@@ -181,7 +182,7 @@ begin
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
 								--only add new if parity is turned off or ok.
 								data_out<=data_tmp;
-								done <= '1';
+
 								data_ready<='0';
 							end if;
 

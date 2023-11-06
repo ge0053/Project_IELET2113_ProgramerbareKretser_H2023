@@ -88,19 +88,20 @@ begin
 					if send_data ='1' then
 						data_sample <= data_in;
 						next_state <= START;
-						next_ready<='0';
+						ready<='0';
 						-- calculate parity
 						if PARITY_ON=1 then 
 							parity_bit<=vec_parity(data_in) xor PARITY_ODD;
 						end if;
 					else
-						next_ready<='1';
+						ready<='1';
 					end if;
 ----------------------------------------------------------------------
 				when START =>
 					tx_out<='0';
+					ready<='0';
 					if clk_buff >=clk_divider then
-					
+						
 						next_state <=DATA;
 
 						next_clk_buff:=0;
@@ -110,6 +111,7 @@ begin
 --------------------------------------------------------------------
 				when DATA => -- sampel multiple points to make sure it was a startbit.
 					tx_out<=data_sample(0);
+					ready<='1';
 					if clk_buff >=clk_divider then
 					
 						if bit_counter >= DATA_LENGTH-1 then 
@@ -132,6 +134,7 @@ begin
 --------------------------------------------------------------------
 				when PARITY =>
 					tx_out<=parity_bit;
+					ready<='1';
 					if clk_buff >=clk_divider then
 					
 						next_state <=STOP;
@@ -144,7 +147,7 @@ begin
 --------------------------------------------------------------------
 				when STOP =>
 					tx_out<='1';
-					next_ready<='1';
+					ready<='1';
 					if clk_buff >=clk_divider then
 					
 						next_state <=IDLE;
@@ -157,7 +160,7 @@ begin
 			end case;
 	
 		clk_buff<=next_clk_buff;
-		ready<=next_ready;
+		--ready<=next_ready;
 		end if;
 			
     end process;

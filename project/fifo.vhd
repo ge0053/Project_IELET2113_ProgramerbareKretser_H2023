@@ -13,6 +13,7 @@ entity fifo is
         clk   : in  std_logic;
         rst_n : in  std_logic;
 		readDataIn : in std_logic;
+		dataInHandled: out std_logic:='0';
         data_in : in  std_logic_vector(DATA_LENGTH-1 downto 0);
 		dataOutHandled: in std_logic;
         data_out : out  std_logic_vector(DATA_LENGTH-1 downto 0);
@@ -51,7 +52,11 @@ begin
         end if;
 	end process;	
     process(all)
-		variable tmp_outBuffer : t_fifo := outBuffer;
+		variable tmp_outBuffer : t_fifo := ( 	FIFO =>(others => (others =>'0')),
+									place=>0,
+									pop=>0,
+									full=>'0',
+									empty=>'1');
 
 	begin
 	--tmp_outBuffer := outBuffer;
@@ -59,7 +64,8 @@ begin
 		--wait on positive edge
 		if readDataIn_sample = "01" then
 			fifo_place(tmp_outBuffer,data_in);
-		
+			--data_out<=data_in;
+			dataInHandled<= not dataInHandled ;
 		end if;
 		
 		case current_state is
@@ -67,7 +73,6 @@ begin
 			when IDLE =>
 				if dataOutHandled='1' then 
 					next_state<= POS_EDGE;
-				else
 					dataOutReady<='0';
 				end if;
 			when POS_EDGE =>
@@ -76,6 +81,8 @@ begin
 					if tmp_outBuffer.empty /='1' then
 						next_state <= POSITIVE_SIGN;
 						fifo_pop(tmp_outBuffer,data_out);
+					else
+						dataOutReady<='0';
 					end if;
 				else 
 					next_state <=IDLE;
@@ -111,6 +118,6 @@ begin
 	end if;
 
 	--dataOutReady <=sendData;
-	outBuffer<=tmp_outBuffer;
+	--outBuffer<=tmp_outBuffer;
     end process;
 end architecture;

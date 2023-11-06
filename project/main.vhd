@@ -21,12 +21,13 @@ port (
         clk   : in  std_logic;
         rst_n : in  std_logic;
         rx_in : in  std_logic;
-		
+		lock_tx:in std_logic;
 		svnSegment : out t_6_svn_disp;
 		
 		rx_done  :  out std_logic:='0';
 		tx_data : out std_logic:='0';
 		signalOut : out std_logic
+		
 		);
 
 
@@ -43,6 +44,7 @@ architecture rtl1 of project1 is
 	signal fifo_out : std_logic_vector(7 downto 0):="00000000";
 	signal fifo_out_ready : std_logic;
 	SIGNAL tmp_signalOut :std_logic;
+	signal dataInHandled:  std_logic;
 
 begin
 
@@ -84,7 +86,7 @@ begin
 		port map (
 		   clk => clk,  
 			rst_n => rst_n,
-			send_data=>fifo_out_ready,
+			send_data=>fifo_out_ready ,
 			data_in=> fifo_out,
 			tx_out => tmp_signalOut,
 			ready => tx_ready
@@ -101,10 +103,12 @@ begin
 			clk => clk,
 			rst_n => rst_n,
 			readDataIn=> rx_ready,
+			
 			data_in=> rx_data,
-			dataOutHandled=>tx_ready ,
+			dataOutHandled=>(tx_ready and lock_tx) ,
 			data_out=> fifo_out,
-			dataOutReady=> fifo_out_ready
+			dataOutReady=>fifo_out_ready ,
+			dataInHandled=> dataInHandled
 	);
 	
 
@@ -116,7 +120,7 @@ svnSegment(2) <= vecTo_svnSegmentAscii(rx_data);
 svnSegment(3) <= vecTo_svnSegmentHex(fifo_out(3 downto 0));
 svnSegment(4) <= vecTo_svnSegmentHex(fifo_out(7 downto 4));
 --svnSegment(4) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,2));
-svnSegment(5) <=rx_ready& tx_ready & fifo_out_ready & "11111";
+svnSegment(5) <=rx_ready& tx_ready & fifo_out_ready & dataInHandled & "1111";
 tx_data <=  tmp_signalOut;
 signalOut <=  tmp_signalOut;
 
