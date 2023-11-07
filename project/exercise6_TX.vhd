@@ -72,7 +72,7 @@ begin
 	
 	
     process(all)
-	variable next_clk_buff : integer range 0 to clk_divider+1:=clk_buff;
+	variable next_clk_buff : integer range 0 to clk_divider+1:=0;
     begin
 		--tmp_outBuffer := outBuffer;
 	

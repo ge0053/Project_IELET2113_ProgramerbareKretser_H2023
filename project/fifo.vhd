@@ -92,6 +92,8 @@ begin
 				if dataOutHandled='0' then 
 					next_state <= IDLE;
 				end if;
+			when others =>
+				next_state<=IDLE;
 		end case;
 
 			
