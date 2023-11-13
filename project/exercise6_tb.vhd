@@ -20,13 +20,15 @@ architecture Behavior of exercise6_tb is
     signal rst_n            : std_logic := '1';
     signal done             : std_logic;
     signal fifoBuffer_signal : t_fifo;  -- FIFO Buffer signal
+	
     
     -- 7-segment display signals
     signal svnSegment        : t_6_svn_disp;
     
     -- Signal for data to send
     signal data_to_send      : std_logic_vector(7 downto 0) := "00000000"; -- Initialize to all zeros
-
+	signal signalOut :  std_logic ;  -- for testing
+	signal lock_tx: std_logic;
 begin
 
     -- UART Receiver Instance
@@ -44,9 +46,11 @@ begin
             clk => clk,
             rst_n => rst_n,
             rx_in => RX_in,
+			lock_tx => lock_tx,
             svnSegment => svnSegment,
 			rx_done => done,
-			tx_data => data_out
+			tx_data => data_out,
+			signalOut => signalOut --for testing
             --fifoBuffer => fifoBuffer_signal  -- Mapping FIFO Buffer
         );
 
@@ -79,7 +83,7 @@ begin
             
             RX_in <= '1';
             
-            wait for 20*BIT_PERIOD;
+            wait for 2*BIT_PERIOD;
             
             -- if fifoBuffer_signal.empty = '0' then
                 -- report "FIFO has data.";

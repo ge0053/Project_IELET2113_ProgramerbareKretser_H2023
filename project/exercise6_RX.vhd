@@ -81,7 +81,7 @@ begin
 		-- align clock to startbit edge
 			v_clk_buff := 0;
 			v_UART_OVERSAMPLE_CLK:='0';
-		-- update the UART clock
+		-- update the UART_RX clock
 		elsif rising_edge(clk) then
 			if v_clk_buff < clk_divider then 
 				v_clk_buff:= clk_buff + 1;
@@ -100,7 +100,6 @@ begin
 	variable tmp_alignStart : std_logic:='0';
 	--variable tmp_outBuffer : t_fifo ;
     begin
-		--tmp_outBuffer := outBuffer;
 		if current_state = IDLE then
 			
 			-- detect possible startbit and align clock to this.
@@ -181,7 +180,9 @@ begin
 						if vec_more_Ones(sampler) then 
 							if (((PARITY_ON/=0) and (vec_parity(data_tmp)=PARITY_ODD)) or PARITY_ON=0) then
 								--only add new if parity is turned off or ok.
-								data_out<=data_tmp;
+								
+								--only add data. not parity
+								data_out<=data_tmp (DATA_LENGTH-1 downto 0);
 
 								data_ready<='0';
 							end if;

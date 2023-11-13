@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.fifo_pkg.all;
+--use work.fifo_pkg.all;
 
 use work.seven_segment_pkg.all;
 -- deklarasjon
@@ -26,7 +26,7 @@ port (
 		
 		rx_done  :  out std_logic:='0';
 		tx_data : out std_logic:='0';
-		signalOut : out std_logic
+		signalOut : out std_logic  -- for testing
 		
 		);
 
@@ -105,7 +105,7 @@ begin
 			readDataIn=> rx_ready,
 			
 			data_in=> rx_data,
-			dataOutHandled=>(tx_ready and lock_tx) ,
+			dataOutHandled=>(tx_ready) ,
 			data_out=> fifo_out,
 			dataOutReady=>fifo_out_ready ,
 			dataInHandled=> dataInHandled
@@ -120,8 +120,12 @@ svnSegment(2) <= vecTo_svnSegmentAscii(rx_data);
 svnSegment(3) <= vecTo_svnSegmentHex(fifo_out(3 downto 0));
 svnSegment(4) <= vecTo_svnSegmentHex(fifo_out(7 downto 4));
 --svnSegment(4) <= vecTo_svnSegmentAscii(fifo_get(fifoBuffer,2));
-svnSegment(5) <=rx_ready& tx_ready & fifo_out_ready & dataInHandled & "1111";
+
 tx_data <=  tmp_signalOut;
+
+
+-- for tesing
+svnSegment(5) <=rx_ready& tx_ready & fifo_out_ready & dataInHandled & "1111";
 signalOut <=  tmp_signalOut;
 
 
